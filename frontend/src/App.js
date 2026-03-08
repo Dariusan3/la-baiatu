@@ -1,52 +1,75 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import AboutSection from "@/components/AboutSection";
+import PopularDishes from "@/components/PopularDishes";
+import MenuSection from "@/components/MenuSection";
+import GallerySection from "@/components/GallerySection";
+import ReviewsSection from "@/components/ReviewsSection";
+import ContactSection from "@/components/ContactSection";
+import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+function App() {
+  const [menuItems, setMenuItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [popularDishes, setPopularDishes] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [restaurantInfo, setRestaurantInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    helloWorldApi();
+  const fetchData = useCallback(async () => {
+    try {
+      const [menuRes, catRes, popRes, revRes, infoRes] = await Promise.all([
+        axios.get(`${API}/menu`),
+        axios.get(`${API}/menu/categories`),
+        axios.get(`${API}/menu/popular`),
+        axios.get(`${API}/reviews`),
+        axios.get(`${API}/restaurant-info`),
+      ]);
+      setMenuItems(menuRes.data);
+      setCategories(catRes.data);
+      setPopularDishes(popRes.data);
+      setReviews(revRes.data);
+      setRestaurantInfo(infoRes.data);
+    } catch (e) {
+      console.error("Error fetching data:", e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-function App() {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background" data-testid="loading-screen">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="font-serif text-xl text-foreground">Se încarcă...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <div className="min-h-screen bg-background" data-testid="app-container">
+      <Toaster position="top-right" />
+      <Navbar />
+      <HeroSection info={restaurantInfo} />
+      <AboutSection info={restaurantInfo} />
+      <PopularDishes dishes={popularDishes} />
+      <MenuSection items={menuItems} categories={categories} />
+      <GallerySection />
+      <ReviewsSection reviews={reviews} />
+      <ContactSection info={restaurantInfo} />
+      <Footer info={restaurantInfo} />
     </div>
   );
 }

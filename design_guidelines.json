@@ -1,0 +1,115 @@
+{
+  "identity": {
+    "name": "La Băiatu'",
+    "tagline": "Gustul de acasă - Tradiție Românească",
+    "tone": "Warm, Nostalgic, Authentic, Hearty, Welcoming",
+    "target_audience": "Locals seeking comfort food, Tourists wanting authentic experience, Families"
+  },
+  "visual_strategy": {
+    "theme": "modern_traditional",
+    "mood_board": [
+      "Textured paper backgrounds",
+      "Wood grain accents",
+      "Warm ambient lighting",
+      "Handwritten notes",
+      "Generous white space with warm tint"
+    ],
+    "colors": {
+      "primary": "#A63C3C",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#D4A017",
+      "secondary_foreground": "#2D2420",
+      "background": "#FDFBF7",
+      "foreground": "#2D2420",
+      "muted": "#EFEBE0",
+      "muted_foreground": "#6B5E55",
+      "accent": "#5D7553",
+      "accent_foreground": "#FFFFFF",
+      "border": "#E6E0D0",
+      "input": "#E6E0D0",
+      "ring": "#A63C3C"
+    },
+    "typography": {
+      "headings": {
+        "family": "Playfair Display, serif",
+        "weights": ["600", "700"],
+        "usage": "Section titles, Hero text, Dish names"
+      },
+      "body": {
+        "family": "Lato, sans-serif",
+        "weights": ["400", "700"],
+        "usage": "Descriptions, Reviews, UI elements"
+      },
+      "accents": {
+        "family": "Caveat, cursive",
+        "weights": ["400"],
+        "usage": "Chef's notes, Special offers, Price tags"
+      }
+    },
+    "spacing": {
+      "container_padding": "p-6 md:p-12 lg:p-24",
+      "section_gap": "gap-12 md:gap-24",
+      "element_gap": "gap-4 md:gap-8"
+    },
+    "radius": "0.5rem"
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-lg font-serif shadow-lg hover:shadow-xl transition-all hover:-translate-y-1",
+      "secondary": "bg-transparent border-2 border-primary text-primary hover:bg-primary/10 rounded-full px-8 py-6 text-lg font-serif transition-all",
+      "ghost": "hover:bg-accent/10 text-foreground hover:text-accent font-medium"
+    },
+    "cards": {
+      "menu_item": "bg-white border border-border/60 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden group",
+      "review": "bg-[#FDFBF7] border border-border p-8 rounded-lg shadow-sm relative italic",
+      "feature": "relative overflow-hidden rounded-2xl aspect-[4/5] group cursor-pointer"
+    },
+    "inputs": {
+      "default": "bg-white border-input focus:border-primary focus:ring-primary/20 rounded-lg h-12"
+    }
+  },
+  "layout_patterns": {
+    "hero": "Split screen: Left content (Text + CTA) with heavy vertical padding, Right image (Full height cover) or Center aligned with background overlay",
+    "menu_section": "Tabs for categories (Breakfast, Soups, etc.) -> Grid of dishes. Each dish card has image top, title serif, dotted leader line to price, description below.",
+    "bento_grid": "Use for 'Popular Dishes'. Mix of large squares (featured item) and smaller rectangles (secondary items)."
+  },
+  "image_assets": {
+    "hero_bg": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1920&auto=format&fit=crop",
+    "about_interior": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop",
+    "menu_items": {
+      "soup": "https://images.unsplash.com/photo-1633070962060-6fae2bc680fa?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDJ8MHwxfHNlYXJjaHwyfHxydXN0aWMlMjBmZWFzdCUyMHRhYmxlJTIwZ3JpbGxlZCUyMHNhdXNhZ2VzJTIwY2FiYmFnZSUyMHJvbGxzJTIwc291cCUyMGJyZWFkfGVufDB8fHx8MTc3Mjk5Mjc3M3ww&ixlib=rb-4.1.0&q=85",
+      "bread": "https://images.unsplash.com/photo-1638805426661-dbe6842813f8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDJ8MHwxfHNlYXJjaHwxfHxydXN0aWMlMjBmZWFzdCUyMHRhYmxlJTIwZ3JpbGxlZCUyMHNhdXNhZ2VzJTIwY2FiYmFnZSUyMHJvbGxzJTIwc291cCUyMGJyZWFkfGVufDB8fHx8MTc3Mjk5Mjc3M3ww&ixlib=rb-4.1.0&q=85",
+      "grill": "https://images.unsplash.com/photo-1544025162-d76690b67f61?q=80&w=1000&auto=format&fit=crop",
+      "dessert": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=1000&auto=format&fit=crop"
+    },
+    "placeholders": {
+      "food": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000&auto=format&fit=crop",
+      "interior": "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1000&auto=format&fit=crop"
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. Setup Tailwind Colors: Update tailwind.config.js with the specific hex codes provided in 'visual_strategy.colors'. Do not use default slate/zinc.",
+    "2. Fonts: Import 'Playfair Display', 'Lato', and 'Caveat' from Google Fonts in index.css.",
+    "3. Hero Section: Must use a warm overlay (bg-black/40 or bg-primary/20) on the background image to ensure text readability.",
+    "4. Menu: Implement a tabbed interface. Do not list all items in one long scroll. Use 'Tabs' component from shadcn/ui.",
+    "5. Reservations: Use the 'Calendar' and 'Popover' components for the date picker. Style it to match the warm theme (no blue accents).",
+    "6. Maps: Use the real address (Aleea Anemonelor 21, 330055 Deva) in the iframe embed.",
+    "7. Language: Ensure all visible text is in Romanian as per requirements (Meniu, Despre Noi, Contact, Rezervări).",
+    "8. Animations: Add gentle fade-in-up animations to menu cards using framer-motion or tailwind-animate.",
+    "9. Shadows: Use 'shadow-lg' and 'shadow-xl' on hover for cards to give them depth, mimicking physical menu cards.",
+    "10. Texture: Consider adding a subtle noise texture to the body background if possible for that 'paper' feel."
+  ],
+  "UNIVERSAL_GUIDELINES": {
+    "DO_NOT": [
+      "Use purple, blue (except links), or cool grays.",
+      "Use generic 'Lorem Ipsum' - use food-related placeholders if needed.",
+      "Use default shadcn radius - stick to 0.5rem or 0.75rem.",
+      "Make the site look 'techy' or 'SaaS-like'."
+    ],
+    "MUST": [
+      "Mobile-First: Ensure the menu is readable on phones (1 column).",
+      "Accessible: Ensure text contrast on the primary red background is high enough (use white text).",
+      "Performance: Lazy load images below the fold."
+    ]
+  }
+}

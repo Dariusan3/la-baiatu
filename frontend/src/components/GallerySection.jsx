@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { X } from "lucide-react";
 
 const GALLERY_IMAGES = [
@@ -9,8 +10,6 @@ const GALLERY_IMAGES = [
   { src: "https://images.unsplash.com/photo-1544025162-d76690b67f61?q=80&w=800&auto=format&fit=crop", alt: "Grătar tradițional", caption: "La grătar" },
   { src: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800&auto=format&fit=crop", alt: "Atmosferă caldă", caption: "Atmosfera caldă" },
   { src: "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?q=80&w=800&auto=format&fit=crop", alt: "Deserturi delicioase", caption: "Deserturi delicioase" },
-  { src: "https://images.unsplash.com/photo-1638805426661-dbe6842813f8?q=80&w=800&auto=format&fit=crop", alt: "Pâine de casă", caption: "Pâine de casă" },
-  { src: "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=800&auto=format&fit=crop", alt: "Restaurant exterior", caption: "Exterior restaurant" },
 ];
 
 export default function GallerySection() {
@@ -22,7 +21,7 @@ export default function GallerySection() {
       data-testid="gallery-section"
       className="py-16 md:py-24 px-6 md:px-12 lg:px-24"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <p className="font-accent text-2xl text-primary mb-2">Imagini</p>
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
@@ -33,31 +32,39 @@ export default function GallerySection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-          {GALLERY_IMAGES.map((img, index) => (
-            <div
-              key={index}
-              onClick={() => setSelectedImage(img)}
-              className={`relative overflow-hidden rounded-xl cursor-pointer group ${
-                index === 0 ? "col-span-2 row-span-2" : ""
-              }`}
-              data-testid={`gallery-image-${index}`}
-            >
-              <div className={`${index === 0 ? "aspect-square" : "aspect-[4/3]"}`}>
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
-                />
-              </div>
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-end">
-                <p className="text-white font-serif text-sm p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  {img.caption}
-                </p>
-              </div>
-            </div>
-          ))}
+        <div className="px-12">
+          <Carousel
+            opts={{ align: "start", loop: true }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4">
+              {GALLERY_IMAGES.map((img, index) => (
+                <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                  <div
+                    onClick={() => setSelectedImage(img)}
+                    className="relative overflow-hidden rounded-xl cursor-pointer group"
+                    data-testid={`gallery-image-${index}`}
+                  >
+                    <div className="aspect-[4/3]">
+                      <img
+                        src={img.src}
+                        alt={img.alt}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-end">
+                      <p className="text-white font-serif text-sm p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                        {img.caption}
+                      </p>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
         </div>
       </div>
 

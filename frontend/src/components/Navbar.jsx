@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 const NAV_LINKS = [
   { href: "#acasa", label: "Acasă" },
   { href: "#despre", label: "Despre Noi" },
-  { href: "#populare", label: "Populare" },
   { href: "#meniu", label: "Meniu" },
   { href: "#galerie", label: "Galerie" },
   { href: "#recenzii", label: "Recenzii" },
@@ -65,7 +64,7 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
-            <a href="tel:+40735041576" data-testid="nav-phone-btn">
+            <a href="tel:0750868367" data-testid="nav-phone-btn">
               <Button
                 size="sm"
                 className="rounded-full bg-primary text-white hover:bg-primary/90 gap-2 px-5"
@@ -102,7 +101,7 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="tel:+40735041576"
+              href="tel:0750868367"
               className="block mt-4"
             >
               <Button className="w-full rounded-full bg-primary text-white gap-2">

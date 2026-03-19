@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
-import PopularDishes from "@/components/PopularDishes";
 import MenuSection from "@/components/MenuSection";
 import GallerySection from "@/components/GallerySection";
 import ReviewsSection from "@/components/ReviewsSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
+import CartButton from "@/components/CartButton";
+import CartDrawer from "@/components/CartDrawer";
 import { Toaster } from "@/components/ui/sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -17,23 +19,20 @@ const API = `${BACKEND_URL}/api`;
 function App() {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [popularDishes, setPopularDishes] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [restaurantInfo, setRestaurantInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     try {
-      const [menuRes, catRes, popRes, revRes, infoRes] = await Promise.all([
+      const [menuRes, catRes, revRes, infoRes] = await Promise.all([
         axios.get(`${API}/menu`),
         axios.get(`${API}/menu/categories`),
-        axios.get(`${API}/menu/popular`),
         axios.get(`${API}/reviews`),
         axios.get(`${API}/restaurant-info`),
       ]);
       setMenuItems(menuRes.data);
       setCategories(catRes.data);
-      setPopularDishes(popRes.data);
       setReviews(revRes.data);
       setRestaurantInfo(infoRes.data);
     } catch (e) {
@@ -59,18 +58,21 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="app-container">
-      <Toaster position="top-right" />
-      <Navbar />
-      <HeroSection info={restaurantInfo} />
-      <AboutSection info={restaurantInfo} />
-      <PopularDishes dishes={popularDishes} />
-      <MenuSection items={menuItems} categories={categories} />
-      <GallerySection />
-      <ReviewsSection reviews={reviews} />
-      <ContactSection info={restaurantInfo} />
-      <Footer info={restaurantInfo} />
-    </div>
+    <CartProvider>
+      <div className="min-h-screen bg-background" data-testid="app-container">
+        <Toaster position="top-right" />
+        <Navbar />
+        <HeroSection info={restaurantInfo} />
+        <AboutSection info={restaurantInfo} />
+        <MenuSection items={menuItems} categories={categories} />
+        <GallerySection />
+        <ReviewsSection reviews={reviews} />
+        <ContactSection info={restaurantInfo} />
+        <Footer info={restaurantInfo} />
+        <CartButton />
+        <CartDrawer />
+      </div>
+    </CartProvider>
   );
 }
 

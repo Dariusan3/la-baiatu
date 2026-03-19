@@ -1,8 +1,11 @@
 import React from "react";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, ThumbsUp } from "lucide-react";
 
 export default function ReviewsSection({ reviews }) {
   if (!reviews || reviews.length === 0) return null;
+
+  const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  const satisfactionPct = ((reviews.filter((r) => r.rating >= 4).length / reviews.length) * 100).toFixed(1);
 
   return (
     <section
@@ -16,9 +19,13 @@ export default function ReviewsSection({ reviews }) {
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
             Recenzii
           </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto text-base">
-            Opiniile clienților noștri sunt cea mai mare răsplată
-          </p>
+
+          {/* Satisfaction badge */}
+          <div className="inline-flex items-center gap-3 bg-white border border-border rounded-full px-6 py-3 shadow-sm mt-2">
+            <ThumbsUp className="w-5 h-5 text-accent" />
+            <span className="font-serif text-2xl font-bold text-primary">{satisfactionPct}%</span>
+            <span className="text-muted-foreground text-sm">satisfacție clienți</span>
+          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

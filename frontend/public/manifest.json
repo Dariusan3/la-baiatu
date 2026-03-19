@@ -1,0 +1,11 @@
+{
+  "short_name": "La Băiatu'",
+  "name": "La Băiatu' - Restaurant Tradițional Românesc",
+  "description": "Restaurant tradițional românesc în Deva. Comandă online sau rezervă o masă.",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#A63C3C",
+  "background_color": "#FBF9F5",
+  "lang": "ro",
+  "icons": []
+}

@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 import json
-from _shared import json_headers, COUPONS
+from shared import json_headers, COUPONS
 
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):

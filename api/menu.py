@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler
 import json
 from urllib.parse import urlparse, parse_qs
 import re
-from _shared import get_db, json_headers, seed_if_needed
+from shared import get_db, json_headers, seed_if_needed
 
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):

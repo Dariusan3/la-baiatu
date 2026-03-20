@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 import json
 from datetime import datetime, timezone
-from _shared import get_db, json_headers, gen_id
+from shared import get_db, json_headers, gen_id
 
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):

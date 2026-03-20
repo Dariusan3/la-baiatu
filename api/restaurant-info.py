@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 import json
-from _shared import RESTAURANT_INFO, json_headers
+from shared import RESTAURANT_INFO, json_headers
 
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):

@@ -2,7 +2,7 @@ import React from "react";
 import { Star, Quote, ThumbsUp } from "lucide-react";
 
 export default function ReviewsSection({ reviews }) {
-  if (!reviews || reviews.length === 0) return null;
+  if (!Array.isArray(reviews) || reviews.length === 0) return null;
 
   const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
   const satisfactionPct = ((reviews.filter((r) => r.rating >= 4).length / reviews.length) * 100).toFixed(1);

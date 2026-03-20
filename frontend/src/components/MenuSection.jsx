@@ -33,7 +33,7 @@ const CATEGORY_IMAGES = {
   desert: "https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=1200&auto=format&fit=crop",
 };
 
-export default function MenuSection({ items }) {
+export default function MenuSection({ items = [] }) {
   const [activeCategory, setActiveCategory] = useState("mic_dejun");
   const [searchQuery, setSearchQuery] = useState("");
   const { addItem } = useCart();

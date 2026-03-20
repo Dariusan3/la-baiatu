@@ -34,7 +34,7 @@ const CATEGORY_IMAGES = {
 };
 
 export default function MenuSection({ items }) {
-  const safeItems = Array.isArray(items) ? items : [];
+  const safeItems = useMemo(() => Array.isArray(items) ? items : [], [items]);
   const [activeCategory, setActiveCategory] = useState("mic_dejun");
   const [searchQuery, setSearchQuery] = useState("");
   const { addItem } = useCart();

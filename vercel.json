@@ -2,7 +2,20 @@
   "buildCommand": "cd frontend && npm install --legacy-peer-deps && npm run build",
   "outputDirectory": "frontend/build",
   "framework": null,
+  "functions": {
+    "api/*.py": {
+      "runtime": "@vercel/python@4.5.0"
+    }
+  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/menu/popular", "destination": "/api/menu" },
+    { "source": "/api/menu/categories", "destination": "/api/menu" },
+    { "source": "/api/menu", "destination": "/api/menu" },
+    { "source": "/api/reviews", "destination": "/api/reviews" },
+    { "source": "/api/restaurant-info", "destination": "/api/restaurant-info" },
+    { "source": "/api/reservations", "destination": "/api/reservations" },
+    { "source": "/api/orders", "destination": "/api/orders" },
+    { "source": "/api/coupons/validate", "destination": "/api/coupons" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

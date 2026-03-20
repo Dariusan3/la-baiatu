@@ -1,37 +1,36 @@
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pymongo import MongoClient
 import os
 import uuid
 from datetime import datetime, timezone
-from pymongo import MongoClient
+from typing import List, Optional
 
-MONGO_URL = os.environ.get('MONGO_URL', '')
-DB_NAME = os.environ.get('DB_NAME', 'la_baiatu')
+app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# MongoDB connection
 _client = None
 _db = None
 
 def get_db():
     global _client, _db
     if _db is None:
-        _client = MongoClient(MONGO_URL)
-        _db = _client[DB_NAME]
+        _client = MongoClient(os.environ.get("MONGO_URL", ""))
+        _db = _client[os.environ.get("DB_NAME", "la_baiatu")]
     return _db
 
-def json_headers():
-    return {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    }
+def gen_id():
+    return str(uuid.uuid4())
 
-def cors_response():
-    """Handle OPTIONS preflight"""
-    return {
-        'statusCode': 204,
-        'headers': json_headers(),
-        'body': ''
-    }
-
+# Static data
 RESTAURANT_INFO = {
     "name": "La Băiatu'",
     "tagline": "Gustul de acasă - Tradiție Românească",
@@ -39,12 +38,9 @@ RESTAURANT_INFO = {
     "address": "Aleea Anemonelor 21, 330055 Deva, România",
     "phone": "0750 868 367",
     "email": "contact@la-baiatu.ro",
-    "opening_hours": {
-        "Luni - Sâmbătă": "10:00 - 23:30",
-        "Duminică": "13:00 - 23:30"
-    },
+    "opening_hours": {"Luni - Sâmbătă": "10:00 - 23:30", "Duminică": "13:00 - 23:30"},
     "rating": 4.1,
-    "total_reviews": 964
+    "total_reviews": 964,
 }
 
 COUPONS = {
@@ -120,11 +116,7 @@ REVIEWS = [
     {"author": "Elena D.", "rating": 5, "text": "Atmosferă caldă, ca la bunica acasă. Clătitele Ana Lugojana sunt divine!", "date": "2024-08-10"},
 ]
 
-def gen_id():
-    return str(uuid.uuid4())
-
 def seed_if_needed():
-    """Seed menu_items and reviews if empty"""
     db = get_db()
     if db.menu_items.count_documents({}) == 0:
         docs = []
@@ -134,7 +126,128 @@ def seed_if_needed():
             doc.setdefault("image_url", "")
             docs.append(doc)
         db.menu_items.insert_many(docs)
-
     if db.reviews.count_documents({}) == 0:
         docs = [{"id": gen_id(), **r} for r in REVIEWS]
         db.reviews.insert_many(docs)
+
+# Routes
+@app.get("/api/restaurant-info")
+def restaurant_info():
+    return RESTAURANT_INFO
+
+@app.get("/api/menu")
+def get_menu(category: Optional[str] = None, search: Optional[str] = None):
+    seed_if_needed()
+    db = get_db()
+    query = {}
+    if category:
+        query["category"] = category
+    if search:
+        query["name"] = {"$regex": search, "$options": "i"}
+    items = list(db.menu_items.find(query, {"_id": 0}))
+    return items
+
+@app.get("/api/menu/popular")
+def get_popular():
+    seed_if_needed()
+    db = get_db()
+    items = list(db.menu_items.find({"is_popular": True}, {"_id": 0}))
+    return items
+
+@app.get("/api/menu/categories")
+def get_categories():
+    seed_if_needed()
+    db = get_db()
+    categories = db.menu_items.distinct("category")
+    category_map = {
+        "mic_dejun": "Mic Dejun",
+        "ciorbe_supe": "Ciorbe & Supe",
+        "paste": "Paste",
+        "preparate_baza": "Preparate de Bază",
+        "garnituri": "Garnituri",
+        "salate": "Salate",
+        "desert": "Desert",
+    }
+    return [{"id": c, "label": category_map.get(c, c)} for c in categories]
+
+@app.get("/api/reviews")
+def get_reviews():
+    seed_if_needed()
+    db = get_db()
+    reviews = list(db.reviews.find({}, {"_id": 0}))
+    return reviews
+
+@app.post("/api/reservations")
+def create_reservation(data: dict):
+    db = get_db()
+    reservation = {
+        "id": gen_id(),
+        "name": data["name"],
+        "email": data["email"],
+        "phone": data["phone"],
+        "date": data["date"],
+        "time": data["time"],
+        "guests": data["guests"],
+        "notes": data.get("notes", ""),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    db.reservations.insert_one({**reservation})
+    reservation.pop("_id", None)
+    return reservation
+
+@app.get("/api/reservations")
+def get_reservations():
+    db = get_db()
+    return list(db.reservations.find({}, {"_id": 0}))
+
+@app.post("/api/coupons/validate")
+def validate_coupon(data: dict):
+    code = data.get("code", "").strip().upper()
+    if code in COUPONS:
+        return {"valid": True, **COUPONS[code]}
+    return {"valid": False, "message": "Codul cuponului nu este valid."}
+
+@app.post("/api/orders")
+def create_order(data: dict):
+    items = data.get("items", [])
+    if not items:
+        raise HTTPException(status_code=400, detail="Coșul este gol.")
+
+    total = sum(i["price"] * i["quantity"] for i in items)
+
+    coupon_code = data.get("coupon_code")
+    if coupon_code:
+        code = coupon_code.strip().upper()
+        if code in COUPONS:
+            total = total * (1 - COUPONS[code]["discount_percent"] / 100)
+
+    if total < 25:
+        raise HTTPException(status_code=400, detail="Valoarea minimă a comenzii este 25 RON.")
+
+    delivery_method = data.get("delivery_method", "livrare")
+    address = data.get("address")
+    if delivery_method == "livrare":
+        if not address or not address.get("strada") or not address.get("oras"):
+            raise HTTPException(status_code=400, detail="Adresa este obligatorie pentru livrare.")
+
+    db = get_db()
+    order = {
+        "id": gen_id(),
+        "items": items,
+        "delivery_method": delivery_method,
+        "address": address,
+        "coupon_code": coupon_code,
+        "phone": data.get("phone", ""),
+        "notes": data.get("notes", ""),
+        "total": round(total, 2),
+        "status": "nou",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    db.orders.insert_one({**order})
+    order.pop("_id", None)
+    return order
+
+@app.get("/api/orders")
+def get_orders():
+    db = get_db()
+    return list(db.orders.find({}, {"_id": 0}))

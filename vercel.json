@@ -3,14 +3,7 @@
   "outputDirectory": "frontend/build",
   "framework": null,
   "rewrites": [
-    { "source": "/api/menu/popular", "destination": "/api/menu" },
-    { "source": "/api/menu/categories", "destination": "/api/menu" },
-    { "source": "/api/menu", "destination": "/api/menu" },
-    { "source": "/api/reviews", "destination": "/api/reviews" },
-    { "source": "/api/restaurant-info", "destination": "/api/restaurant-info" },
-    { "source": "/api/reservations", "destination": "/api/reservations" },
-    { "source": "/api/orders", "destination": "/api/orders" },
-    { "source": "/api/coupons/validate", "destination": "/api/coupons" },
+    { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

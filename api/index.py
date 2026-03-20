@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
+import certifi
 import os
 import uuid
 from datetime import datetime, timezone
@@ -23,7 +24,7 @@ _db = None
 def get_db():
     global _client, _db
     if _db is None:
-        _client = MongoClient(os.environ.get("MONGO_URL", ""))
+        _client = MongoClient(os.environ.get("MONGO_URL", ""), tlsCAFile=certifi.where())
         _db = _client[os.environ.get("DB_NAME", "la_baiatu")]
     return _db
 

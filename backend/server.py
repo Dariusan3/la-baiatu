@@ -53,6 +53,33 @@ class Reservation(BaseModel):
     notes: str = ""
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class OrderItem(BaseModel):
+    id: str
+    name: str
+    price: float
+    quantity: int
+
+class OrderCreate(BaseModel):
+    items: List[OrderItem]
+    delivery_method: str = "livrare"  # livrare, ridicare, restaurant
+    address: Optional[dict] = None  # {strada, numar, oras}
+    coupon_code: Optional[str] = None
+    phone: str = ""
+    notes: str = ""
+
+class Order(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    items: List[OrderItem]
+    delivery_method: str
+    address: Optional[dict] = None
+    coupon_code: Optional[str] = None
+    phone: str = ""
+    notes: str = ""
+    total: float = 0
+    status: str = "nou"  # nou, in_preparare, gata, livrat
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 class ReservationCreate(BaseModel):
     name: str
     email: str
@@ -226,6 +253,59 @@ async def create_reservation(input_data: ReservationCreate):
 async def get_reservations():
     reservations = await db.reservations.find({}, {"_id": 0}).to_list(100)
     return reservations
+
+# Coupons (hardcoded for demo)
+COUPONS = {
+    "LABAIATU10": {"discount_percent": 10, "description": "10% reducere"},
+    "BAIATU20": {"discount_percent": 20, "description": "20% reducere"},
+}
+
+@api_router.post("/coupons/validate")
+async def validate_coupon(data: dict):
+    code = data.get("code", "").strip().upper()
+    if code in COUPONS:
+        return {"valid": True, **COUPONS[code]}
+    return {"valid": False, "message": "Codul cuponului nu este valid."}
+
+@api_router.post("/orders", response_model=Order)
+async def create_order(input_data: OrderCreate):
+    if not input_data.items:
+        raise HTTPException(status_code=400, detail="Coșul este gol.")
+
+    total = sum(item.price * item.quantity for item in input_data.items)
+
+    # Apply coupon discount
+    discount_percent = 0
+    if input_data.coupon_code:
+        code = input_data.coupon_code.strip().upper()
+        if code in COUPONS:
+            discount_percent = COUPONS[code]["discount_percent"]
+            total = total * (1 - discount_percent / 100)
+
+    if total < 25:
+        raise HTTPException(status_code=400, detail="Valoarea minimă a comenzii este 25 RON.")
+
+    if input_data.delivery_method == "livrare":
+        if not input_data.address or not input_data.address.get("strada") or not input_data.address.get("oras"):
+            raise HTTPException(status_code=400, detail="Adresa este obligatorie pentru livrare.")
+
+    order = Order(
+        items=input_data.items,
+        delivery_method=input_data.delivery_method,
+        address=input_data.address,
+        coupon_code=input_data.coupon_code,
+        phone=input_data.phone,
+        notes=input_data.notes,
+        total=round(total, 2),
+    )
+    doc = order.model_dump()
+    await db.orders.insert_one(doc)
+    return order
+
+@api_router.get("/orders")
+async def get_orders():
+    orders = await db.orders.find({}, {"_id": 0}).to_list(100)
+    return orders
 
 # Include router
 app.include_router(api_router)

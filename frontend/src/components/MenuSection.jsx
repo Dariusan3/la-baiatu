@@ -33,7 +33,7 @@ const CATEGORY_IMAGES = {
   desert: "https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=1200&auto=format&fit=crop",
 };
 
-export default function MenuSection({ items, categories }) {
+export default function MenuSection({ items }) {
   const [activeCategory, setActiveCategory] = useState("mic_dejun");
   const [searchQuery, setSearchQuery] = useState("");
   const { addItem } = useCart();
@@ -94,11 +94,12 @@ export default function MenuSection({ items, categories }) {
         </div>
 
         {/* Category banner image */}
-        <div className="relative h-40 sm:h-52 overflow-hidden mt-0">
+        <div className="relative h-40 sm:h-52 overflow-hidden mt-0 bg-[#1a2332]">
           <img
             src={CATEGORY_IMAGES[activeCategory]}
             alt={CATEGORY_LABELS[activeCategory]}
             className="w-full h-full object-cover"
+            onError={(e) => { e.target.style.display = 'none'; }}
           />
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
             <h3 className="font-serif text-3xl sm:text-5xl font-bold text-white drop-shadow-lg">
